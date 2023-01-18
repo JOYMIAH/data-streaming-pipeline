@@ -3,12 +3,12 @@ import time
 
 from kafka import KafkaProducer
 
-GENERATE_ORDER_SENDING_TOPIC = "test"
+GENERATE_ORDER_SENDING_TOPIC = "Generate_Order_Details"
 ORDER_LIMIT = 500
 
-producer = KafkaProducer(bootstrap_servers={"192.168.61.28:9092","192.168.61.28:9093","192.168.61.28:9094"})
+producer = KafkaProducer(bootstrap_servers={"192.168.61.28:9093","192.168.61.28:9095","192.168.61.28:9097"})
  
-print("Going to be generating order With 2 Second Latency")
+print("Going to be generating order With 1 Second Latency")
 
 
 for orders in range(ORDER_LIMIT):
@@ -23,3 +23,4 @@ for orders in range(ORDER_LIMIT):
     print(f"Sending order For  Transaction Processing {orders}")
     time.sleep(1)
     producer.flush()
+
