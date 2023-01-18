@@ -1,9 +1,9 @@
 version: "3.7"
 services:
-  zookeeper:
+  zookeeper1:
     image: confluentinc/cp-zookeeper:5.5.1
-    container_name: zookeeper
-    hostname: zookeeper
+    container_name: zookeeper1
+    hostname: zookeeper1
     restart: always
     ports:
       - "2181:2181"
@@ -13,25 +13,53 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
-  kafka:
+  zookeeper2:
+    image: confluentinc/cp-zookeeper:5.5.1
+    container_name: zookeeper2
+    hostname: zookeeper2
+    restart: always
+    ports:
+      - "2182:2182"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+  zookeeper3:
+    image: confluentinc/cp-zookeeper:5.5.1
+    container_name: zookeeper3
+    hostname: zookeeper3
+    restart: always
+    ports:
+      - "2183:2183"
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2183
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+  kafka1:
     image: confluentinc/cp-kafka:5.5.1
-    container_name: kafka
-    hostname: kafka
+    container_name: kafka1
+    hostname: kafka1
     restart: always
     ports:
       - "9092:9092"
       - "9093:9093"
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://kafka:9093
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://192.168.61.28:9093    # external clients can connect to 9093 port
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182,zookeeper3:2183
+      KAFKA_LISTENERS: INTERNAL://kafka1:9092,EXTERNAL://kafka1:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9092,EXTERNAL://192.168.61.28:9093    # external clients can connect to 9093 port
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_JMX_HOSTNAME: "kafka"
+      KAFKA_JMX_HOSTNAME: "kafka1"
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka
             -Dcom.sun.management.jmxremote.local.only=false
@@ -39,6 +67,62 @@ services:
             -Dcom.sun.management.jmxremote.port=9999
             -Dcom.sun.management.jmxremote.authenticate=false
             -Dcom.sun.management.jmxremote.ssl=false"
+  kafka2:
+    image: confluentinc/cp-kafka:5.5.1
+    container_name: kafka2
+    hostname: kafka2
+    restart: always
+    ports:
+      - "9094:9094"
+      - "9095:9095"
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182,zookeeper3:2183
+      KAFKA_LISTENERS: INTERNAL://kafka2:9094,EXTERNAL://kafka2:9095
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:9094,EXTERNAL://192.168.61.28:9095    # external clients can connect to 9093 port
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_JMX_HOSTNAME: "kafka2"
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka
+            -Dcom.sun.management.jmxremote.local.only=false
+            -Dcom.sun.management.jmxremote.rmi.port=9999
+            -Dcom.sun.management.jmxremote.port=9999
+            -Dcom.sun.management.jmxremote.authenticate=false
+            -Dcom.sun.management.jmxremote.ssl=false"            
+  kafka3:
+    image: confluentinc/cp-kafka:5.5.1
+    container_name: kafka3
+    hostname: kafka3
+    restart: always
+    ports:
+      - "9096:9096"
+      - "9097:9097"
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182,zookeeper3:2183
+      KAFKA_LISTENERS: INTERNAL://kafka3:9096,EXTERNAL://kafka3:9097
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:9096,EXTERNAL://192.168.61.28:9097    # external clients can connect to 9093 port
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_JMX_HOSTNAME: "kafka3"
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka
+            -Dcom.sun.management.jmxremote.local.only=false
+            -Dcom.sun.management.jmxremote.rmi.port=9999
+            -Dcom.sun.management.jmxremote.port=9999
+            -Dcom.sun.management.jmxremote.authenticate=false
+            -Dcom.sun.management.jmxremote.ssl=false"  
   kafka_manager:
     image: hlebalbau/kafka-manager:stable
     container_name: kakfa-manager
@@ -46,6 +130,6 @@ services:
     ports:
       - "9000:9000"
     environment:
-      ZK_HOSTS: "zookeeper:2181"
+      ZK_HOSTS: "zookeeper1:2181,zookeeper2:2182,zookeeper3:2183"
       APPLICATION_SECRET: "random-secret"
     command: -Dpidfile.path=/dev/null
